@@ -1,0 +1,12 @@
+{
+  "name": "htlc-demo",
+  "version": "0.0.1",
+  "description": "Interactive visualization of HTLCs in-flight",
+  "main": "index.js",
+  "repository": "git@github.com:guggero/htlc-demo.git",
+  "author": "Oliver Gugger <gugger@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "d3": "^5.11.0"
+  }
+}
