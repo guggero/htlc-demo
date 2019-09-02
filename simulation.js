@@ -12,15 +12,19 @@ class Simulation {
         this.chart = this.svg.append('g')
             .attr('class', 'chart')
             .attr('transform', 'translate(0, 0) scale(1)');
-        this.channelContainer = this.chart.append("g").attr("class", "channels");
+        this.channelContainer = this.chart.append('g').attr('class', 'channels');
         this.nodeContainer = this.chart.append('g').attr('class', 'nodes');
 
         this._nodes = nodes;
         this._nodes.forEach((n) => {
             n.x = n.startX;
-            n.y = n.startY;
+            n.y = 0;
         });
         this._channels = channels;
+        this._channels.forEach((c) => {
+            c.source.right = c;
+            c.target.left = c;
+        });
         this.simulation = this._createSimulation();
 
         this.updateSimulationCenter();
@@ -64,7 +68,7 @@ class Simulation {
 
     updateSimulationCenter() {
         const centerX = this.svg.attr('width') / 2;
-        const centerY = this.svg.attr('height') / 2;
+        const centerY = this.svg.attr('height') / 4;
         this.simulation
             .force('center', d3.forceCenter(centerX, centerY))
             .restart();
@@ -72,7 +76,7 @@ class Simulation {
 
     _createSimulation() {
         return d3.forceSimulation(this._nodes)
-            .force('charge', d3.forceManyBody().strength(-1000))
+            .force('charge', d3.forceManyBody().strength(-2000))
             .force('link', d3.forceLink(this._channels).strength(0.001).distance(this.forceDistance))
             .force('y', d3.forceY())
             .alphaTarget(0)
@@ -82,13 +86,11 @@ class Simulation {
     _updateNodes() {
         const opt = this._opt;
 
-        this._nodeElements = this.nodeContainer
-            .selectAll('.node')
+        this._nodeElements = this.nodeContainer.selectAll('.node')
             .data(this._nodes, (data) => data.id);
 
         /* remove deleted nodes */
-        this._nodeElements
-            .exit()
+        this._nodeElements.exit()
             .transition()
             .duration(1000)
             .style('opacity', 0)
@@ -99,11 +101,6 @@ class Simulation {
         createNodeElements(nodeParent, opt);
         nodeParent.call(this.behaviors.drag);
 
-        /* update existing nodes */
-        this._nodeElements
-            .selectAll('.node-text-balance')
-            .text((d) => d.balance);
-
         this.simulation
             .nodes(this._nodes)
             .alphaTarget(1)
@@ -111,8 +108,6 @@ class Simulation {
 
         this._nodeElements = this.nodeContainer
             .selectAll('.node');
-
-        return this._nodeElements;
     }
 
     _updateChannels() {
@@ -131,20 +126,13 @@ class Simulation {
         /* create new svg elements for new channels */
         let channelRoots = this._channelElements.enter().append('g')
             .attr('class', 'channel');
-
+        createChannelElements(channelRoots, opt);
         this._channelElements.merge(channelRoots)
             .attr('id', (d) => d.id);
 
-        channelRoots
-            .append('path')
-            .attr('class', 'path')
-            .attr('id', (d) => `${d.id}_path`)
-            .style('stroke-width', (d) => opt.channels.strokeWidth === 'auto' ? (d.sourceBalance + d.targetBalance) * 2 : opt.channels.strokeWidth)
-            .style('stroke', opt.channels.color)
-            .style('fill', 'none');
-
         /* update this._paths; needed in this._ticked */
-        this._paths = this.channelContainer.selectAll('.channel .path');
+        this._channelElements = this.channelContainer
+            .selectAll('.channel .path');
 
         this.simulation
             .force('link')
@@ -153,8 +141,6 @@ class Simulation {
         this.simulation
             .alphaTarget(0)
             .restart();
-
-        return this._channelElements;
     }
 
     _ticked() {
@@ -162,8 +148,8 @@ class Simulation {
             this._nodeElements.attr('transform', (d) => `translate(${d.x},${d.y})`);
         }
 
-        if (this._paths) {
-            this._paths.attr('d', (d) => `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`);
+        if (this._channelElements) {
+            this._channelElements.attr('d', (d) => `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`);
         }
     }
 

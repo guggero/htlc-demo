@@ -3,34 +3,32 @@ const colorScheme = d3.scaleOrdinal(d3.schemeCategory10);
 
 const nodes = [{
     id: 'node-0',
-    balance: '12',
     color: colorScheme(0),
-    startX: 0,
-    startY: 0
+    startX: 0
 }, {
     id: 'node-1',
-    balance: '34',
     color: colorScheme(1),
-    startX: 100,
-    startY: 0
+    startX: 100
 }, {
     id: 'node-2',
-    balance: '34',
     color: colorScheme(2),
-    startX: 200,
-    startY: 0
+    startX: 200
 }];
 
 const channels = [{
-    sourceBalance: 0,
-    targetBalance: 1,
+    sourceBalance: 500,
+    targetBalance: 100,
+    capacity: 600,
+    cltv: 144,
     source: nodes[0],
     target: nodes[1],
     id: 'channel-0',
     highlighted: false
 }, {
-    sourceBalance: 0,
-    targetBalance: 1,
+    sourceBalance: 300,
+    targetBalance: 100,
+    capacity: 400,
+    cltv: 144,
     source: nodes[1],
     target: nodes[2],
     id: 'channel-1',
@@ -58,7 +56,7 @@ new Simulation(nodes, channels, {
     channels: {
         color: 'gray',
         colorHighlighted: null,
-        strokeWidth: 'auto',
+        strokeWidth: '3px',
         strokeColor: null
     }
 });
