@@ -5,12 +5,13 @@ const height = 6*outputHeight + 3*gap;
 const heightHtlc = height + 5*outputHeight + gap;
 const fontSize = 14;
 const fontOffset = 2;
+const lineHeight = outputHeight;
 
 function multilineText(elem, lines) {
     lines.forEach((line, index) => {
         elem.append('tspan')
             .attr('x', 1.5*gap)
-            .attr('dy', `${index === 0 ? 0 : 1.7}em`)
+            .attr('dy', `${index === 0 ? 0 : lineHeight}px`)
             .style('white-space', 'pre')
             .text(line);
     });
@@ -110,7 +111,7 @@ function fillTxBox(node, isLeft) {
         .attr('font-size', fontSize)
         .attr('text-anchor', 'start')
         .attr('pointer-events', 'none')
-        .text(() => 'remotepubkey');
+        .text(() => '<remote-pubkey>');
 
     const delayTxY = gap + outputHeight;
 
@@ -139,5 +140,54 @@ function fillTxBox(node, isLeft) {
         .attr('font-size', fontSize)
         .attr('text-anchor', 'start')
         .attr('pointer-events', 'none');
-    multilineText(multiline, ['IF', '    revocationpubkey', 'ELSE', '    CSV', '    local_delayedpubkey'])
+    multilineText(multiline, ['IF', '    <revocation-pubkey>', 'ELSE', '    CHECKSEQUENCE 144', '    <local-pubkey>']);
+
+    // revocation output color top part
+    node.append('rect')
+        .attr('fill', (d) => isLeft ? d.left.target.color : d.right.source.color)
+        .attr('x', width - 5.5*gap)
+        .attr('y', 1.5*gap + outputHeight + lineHeight + gap)
+        .attr('width', 4*gap)
+        .attr('height', (outputHeight - gap) / 2)
+        .attr('rx', 2);
+
+    // revocation output color bottom part (red)
+    node.append('rect')
+        .attr('fill', '#f00')
+        .attr('x', width - 5.5*gap)
+        .attr('y', 1.5*gap + outputHeight + lineHeight + gap + (outputHeight - gap) / 2)
+        .attr('width', 4*gap)
+        .attr('height', (outputHeight - gap) / 2)
+        .attr('rx', 2);
+
+    // revocation output amount text
+    node.append('text')
+        .attr('x', width - 2*gap)
+        .attr('y', gap + outputHeight/2 + fontSize/2 - fontOffset + outputHeight + lineHeight + gap)
+        .attr('fill', 'black')
+        .attr('font-family', 'sans-serif')
+        .attr('font-size', fontSize)
+        .attr('text-anchor', 'end')
+        .attr('pointer-events', 'none')
+        .text((d) => isLeft ? d.left.targetBalance : d.right.sourceBalance);
+
+    // delayed output color
+    node.append('rect')
+        .attr('fill', (d) => isLeft ? d.left.source.color : d.right.target.color)
+        .attr('x', width - 5.5*gap)
+        .attr('y', 1.5*gap + outputHeight + 4*lineHeight + gap)
+        .attr('width', 4*gap)
+        .attr('height', outputHeight - gap)
+        .attr('rx', 2);
+
+    // delayed output amount text
+    node.append('text')
+        .attr('x', width - 2*gap)
+        .attr('y', gap + outputHeight/2 + fontSize/2 - fontOffset + outputHeight + 4*lineHeight + gap)
+        .attr('fill', 'black')
+        .attr('font-family', 'sans-serif')
+        .attr('font-size', fontSize)
+        .attr('text-anchor', 'end')
+        .attr('pointer-events', 'none')
+        .text((d) => isLeft ? d.left.sourceBalance : d.right.targetBalance);
 }
