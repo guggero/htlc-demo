@@ -107,7 +107,7 @@ function fillTxBox(node, isLeft) {
         .attr('x', 1.5*gap)
         .attr('y', gap + outputHeight/2 + fontSize/2 - fontOffset)
         .attr('fill', 'black')
-        .attr('font-family', 'sans-serif')
+        .attr('font-family', '"Source Code Pro", monospace')
         .attr('font-size', fontSize)
         .attr('text-anchor', 'start')
         .attr('pointer-events', 'none')
@@ -136,20 +136,19 @@ function fillTxBox(node, isLeft) {
         .attr('x', 1.5*gap)
         .attr('y', gap + outputHeight/2 + fontSize/2 - fontOffset)
         .attr('fill', 'black')
-        .attr('font-family', 'sans-serif')
+        .attr('font-family', '"Source Code Pro", monospace')
         .attr('font-size', fontSize)
         .attr('text-anchor', 'start')
         .attr('pointer-events', 'none');
-    multilineText(multiline, ['IF', '    <revocation-pubkey>', 'ELSE', '    CHECKSEQUENCE 144', '    <local-pubkey>']);
+    multilineText(multiline, ['IF', '  <revocation-pubkey>', 'ELSE', '  CHECKSEQUENCE \u23F3', '  <local-pubkey>']);
 
     // revocation output color top part
     node.append('rect')
-        .attr('fill', (d) => isLeft ? d.left.target.color : d.right.source.color)
+        .attr('fill', (d) => isLeft ? d.left.source.color : d.right.target.color)
         .attr('x', width - 5.5*gap)
         .attr('y', 1.5*gap + outputHeight + lineHeight + gap)
         .attr('width', 4*gap)
-        .attr('height', (outputHeight - gap) / 2)
-        .attr('rx', 2);
+        .attr('height', (outputHeight - gap) / 2);
 
     // revocation output color bottom part (red)
     node.append('rect')
@@ -157,8 +156,7 @@ function fillTxBox(node, isLeft) {
         .attr('x', width - 5.5*gap)
         .attr('y', 1.5*gap + outputHeight + lineHeight + gap + (outputHeight - gap) / 2)
         .attr('width', 4*gap)
-        .attr('height', (outputHeight - gap) / 2)
-        .attr('rx', 2);
+        .attr('height', (outputHeight - gap) / 2);
 
     // revocation output amount text
     node.append('text')
@@ -173,7 +171,7 @@ function fillTxBox(node, isLeft) {
 
     // delayed output color
     node.append('rect')
-        .attr('fill', (d) => isLeft ? d.left.source.color : d.right.target.color)
+        .attr('fill', (d) => isLeft ? d.left.target.color : d.right.source.color)
         .attr('x', width - 5.5*gap)
         .attr('y', 1.5*gap + outputHeight + 4*lineHeight + gap)
         .attr('width', 4*gap)
@@ -189,5 +187,5 @@ function fillTxBox(node, isLeft) {
         .attr('font-size', fontSize)
         .attr('text-anchor', 'end')
         .attr('pointer-events', 'none')
-        .text((d) => isLeft ? d.left.sourceBalance : d.right.targetBalance);
+        .text((d) => isLeft ? d.left.targetBalance : d.right.sourceBalance);
 }
