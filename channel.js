@@ -1,23 +1,19 @@
 function createChannelElements(channelRoots, opt) {
+    // channel line
     channelRoots.append('path')
         .attr('class', 'path')
         .attr('id', (d) => `${d.id}_path`)
         .style('stroke-width', opt.channels.strokeWidth)
-        .style('stroke', opt.channels.color)
-        .style('fill', 'none');
+        .style('stroke', opt.channels.color);
 
-    channelRoots.append('text')
-        .attr('class', 'channel-text')
-        .attr('font-family', 'Verdana')
-        .attr('font-size', '12')
+    // channel text path
+    const text = channelRoots.append('text')
+        .attr('class', 'info-text')
         .attr('dx', 150)
-        .attr('dy', -7)
-        .style('pointer-events', 'none')
-        .append('textPath')
+        .attr('dy', -7);
+    
+    text.append('textPath')
         .attr('xlink:href', (d) => `#${d.id}_path`)
-        .attr('class', 'channel-text-path')
-        .style('stroke-width', 1)
-        .style('stroke', opt.channels.color)
-        .style('fill', 'none')
+        .style('fill', opt.channels.color)
         .text((d) => `capacity: ${d.capacity}, cltv: ${d.cltv}`);
 }

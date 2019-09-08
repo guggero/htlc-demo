@@ -76,7 +76,7 @@ class Simulation {
 
     _createSimulation() {
         return d3.forceSimulation(this._nodes)
-            .force('charge', d3.forceManyBody().strength(-2000))
+            .force('charge', d3.forceManyBody().strength(-4000))
             .force('link', d3.forceLink(this._channels).strength(0.001).distance(this.forceDistance))
             .force('y', d3.forceY())
             .alphaTarget(0)

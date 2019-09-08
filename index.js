@@ -4,6 +4,7 @@ const colorScheme = d3.scaleOrdinal(d3.schemeCategory10);
 const nodes = [{
     id: 'node-0',
     color: colorScheme(0),
+    hasHtlc: true,
     startX: 0
 }, {
     id: 'node-1',
