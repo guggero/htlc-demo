@@ -36,7 +36,7 @@ const channels = [{
     highlighted: false
 }];
 
-new Simulation(nodes, channels, {
+const options = {
     colorScheme,
 
     debug: false,
@@ -58,6 +58,19 @@ new Simulation(nodes, channels, {
         color: 'gray',
         colorHighlighted: null,
         strokeWidth: '3px',
-        strokeColor: null
+        strokeColor: null,
+        showFundingTx: true,
+    }
+};
+
+const sim = new Simulation(nodes, channels, options);
+
+document.addEventListener('DOMContentLoaded', () => {
+    const checkboxFundingTx = document.getElementById('show-funding-tx');
+    if (checkboxFundingTx) {
+        checkboxFundingTx.addEventListener('change', () => {
+            options.channels.showFundingTx = checkboxFundingTx.checked;
+            sim.onUpdate();
+        });
     }
 });

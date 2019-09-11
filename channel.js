@@ -15,5 +15,6 @@ function createChannelElements(channelRoots, opt) {
     text.append('textPath')
         .attr('xlink:href', (d) => `#${d.id}_path`)
         .style('fill', opt.channels.color)
-        .text((d) => `capacity: ${d.capacity}, cltv: ${d.cltv}`);
+        .text((d) => `capacity: ${d.capacity}, cltv: ${d.cltv}, fundingTx: ${opt.channels.showFundingTx}`);
+
 }

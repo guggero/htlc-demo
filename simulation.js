@@ -12,8 +12,10 @@ class Simulation {
         this.chart = this.svg.append('g')
             .attr('class', 'chart')
             .attr('transform', 'translate(0, 0) scale(1)');
-        this.channelContainer = this.chart.append('g').attr('class', 'channels');
-        this.nodeContainer = this.chart.append('g').attr('class', 'nodes');
+        this.channelContainer = this.chart.append('g')
+            .attr('class', 'channels');
+        this.nodeContainer = this.chart.append('g')
+            .attr('class', 'nodes');
 
         this._nodes = nodes;
         this._nodes.forEach((n) => {
@@ -51,6 +53,10 @@ class Simulation {
         this.updateSVGSize();
         this.updateSimulationCenter();
         this.createBehaviors();
+    }
+
+    onUpdate() {
+        this.svg.dispatch('change');
     }
 
     createBehaviors() {
