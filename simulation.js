@@ -7,13 +7,16 @@ class Simulation {
             .attr('class', 'demo')
             .style('background-color', options.container.backgroundColor);
 
-        this.updateSVGSize();
+        this._updateSVGSize();
 
         this.chart = this.svg.append('g')
             .attr('class', 'chart')
             .attr('transform', 'translate(0, 0) scale(1)');
         this.channelContainer = this.chart.append('g').attr('class', 'channels');
         this.nodeContainer = this.chart.append('g').attr('class', 'nodes');
+
+        this.behaviors = this._createBehaviors();
+        this.svg.call(this.behaviors.zoom);
 
         this._nodes = nodes;
         this._nodes.forEach((n) => {
@@ -25,20 +28,28 @@ class Simulation {
             c.source.right = c;
             c.target.left = c;
         });
+        
+        this.onDataUpdate(nodes, channels);
+
         this.simulation = this._createSimulation();
-
-        this.updateSimulationCenter();
-
-        this.behaviors = this.createBehaviors();
-        this.svg.call(this.behaviors.zoom);
-
-        this._updateNodes();
-        this._updateChannels();
-
-        window.addEventListener('resize', this.onResize.bind(this));
+        
+        this._updateSimulationCenter();
+        
+        window.addEventListener('resize', this._onResize.bind(this));
     }
 
-    updateSVGSize() {
+    onDataUpdate(nodes, channels) {
+        this._updateNodes();
+        this._updateChannels();
+    }
+    
+    _onResize() {
+        this._updateSVGSize();
+        this._updateSimulationCenter();
+        this._createBehaviors();
+    }
+
+    _updateSVGSize() {
         this.width = +this.container.clientWidth;
         this.height = +this.container.clientHeight;
         this.forceDistance = (this.width + this.height) * .1;
@@ -47,13 +58,15 @@ class Simulation {
             .attr('height', this.height)
     }
 
-    onResize() {
-        this.updateSVGSize();
-        this.updateSimulationCenter();
-        this.createBehaviors();
+    _updateSimulationCenter() {
+        const centerX = this.svg.attr('width') / 2;
+        const centerY = 100;
+        this.simulation
+            .force('center', d3.forceCenter(centerX, centerY))
+            .restart();
     }
 
-    createBehaviors() {
+    _createBehaviors() {
         return {
             zoom: d3.zoom()
                 .scaleExtent([0.1, 5, 4])
@@ -64,14 +77,6 @@ class Simulation {
                 .on('drag', this._onDragged.bind(this))
                 .on('end', this._onDragendEnd.bind(this))
         }
-    }
-
-    updateSimulationCenter() {
-        const centerX = this.svg.attr('width') / 2;
-        const centerY = this.svg.attr('height') / 4;
-        this.simulation
-            .force('center', d3.forceCenter(centerX, centerY))
-            .restart();
     }
 
     _createSimulation() {
@@ -86,70 +91,53 @@ class Simulation {
     _updateNodes() {
         const opt = this._opt;
 
-        this._nodeElements = this.nodeContainer.selectAll('.node')
-            .data(this._nodes, (data) => data.id);
+        const nodes = this.nodeContainer.selectAll('.node')
+            .data(this._nodes);
 
         /* remove deleted nodes */
-        this._nodeElements.exit()
+        nodes.exit()
             .transition()
             .duration(1000)
             .style('opacity', 0)
             .remove();
 
         /* create new nodes */
-        let nodeParent = this._nodeElements.enter().append('g');
-        createNodeElements(nodeParent, opt);
-        nodeParent.call(this.behaviors.drag);
+        const enter = nodes.enter().append('g');
+        createNodeElements(enter, opt);
+        enter.call(this.behaviors.drag);
 
-        this.simulation
-            .nodes(this._nodes)
-            .alphaTarget(1)
-            .restart();
-
-        this._nodeElements = this.nodeContainer
-            .selectAll('.node');
+        this._nodeElements = enter.merge(nodes);
+        updateNodeElements(this._nodeElements, opt);
     }
 
     _updateChannels() {
         const opt = this._opt;
 
-        this._channelElements = this.channelContainer.selectAll('.channel')
-            .data(this._channels, (d) => d.id);
+        const channels = this.channelContainer.selectAll('.channel')
+            .data(this._channels);
 
         /* remove channels that no longer exist */
-        this._channelElements.exit()
+        channels.exit()
             .transition()
             .duration(500)
             .style('opacity', 0)
             .remove();
 
-        /* create new svg elements for new channels */
-        let channelRoots = this._channelElements.enter().append('g')
-            .attr('class', 'channel');
-        createChannelElements(channelRoots, opt);
-        this._channelElements.merge(channelRoots)
-            .attr('id', (d) => d.id);
+        /* create new channels */
+        let enter = channels.enter().append('g');
+        createChannelElements(enter, opt);
 
-        /* update this._paths; needed in this._ticked */
-        this._channelElements = this.channelContainer
-            .selectAll('.channel .path');
-
-        this.simulation
-            .force('link')
-            .links(this._channels);
-
-        this.simulation
-            .alphaTarget(0)
-            .restart();
+        this._channelElements = enter.merge(channels);
+        updateChannelElements(this._channelElements, opt);
     }
 
     _ticked() {
         if (this._nodeElements) {
-            this._nodeElements.attr('transform', (d) => `translate(${d.x},${d.y})`);
+            tickNodeElements(this._nodeElements);
         }
 
         if (this._channelElements) {
-            this._channelElements.attr('d', (d) => `M${d.source.x},${d.source.y} ${d.target.x},${d.target.y}`);
+            tickChannelElements(this._channelElements);
         }
     }
 
