@@ -10,21 +10,23 @@ const scriptReceiver = [
     'IF',
     '  <revocation-pubkey>',
     'ELSE',
-    '  IF hash(<preimage>)',
-    '    <sendr-pubkey>',
+    '  NOTIF SIZE(<input>) == 32',
+    '    2 <sendr> <recvr> 2 CHECKMULTISIG',
     '  ELSE',
-    '    <recvr-pubkey>'
+    '    HASH(<input>) == <paymenthash>',
+    '    <sendr-pubkey>'
 ];
 
 const scriptSender = [
     'IF',
     '  <revocation-pubkey>',
     'ELSE',
-    '  IF hash(<preimage>)',
-    '     <recvr-pubkey>',
+    '  IF SIZE(<input>) == 32',
+    '    HASH(<input>) == <paymenthash>',
+    '    2 <sendr> <recvr> 2 CHECKMULTISIG',
     '  ELSE',
     '    CHECKLOCKTIME \u23f1',
-    '    <sendr-pubkey>'
+    '    <recvr-pubkey>'
 ];
 
 function tickNodeElements(elems) {

@@ -1,7 +1,7 @@
 const boxOffsetY = 80;
 const boxOffsetX = 24;
 const gap = 8;
-const boxWidth = 250;
+const boxWidth = 400;
 const outputHeight = 25;
 const height = 6*outputHeight + 3*gap;
 const heightHtlcRight = height + 8*outputHeight + gap;
