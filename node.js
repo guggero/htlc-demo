@@ -52,7 +52,7 @@ function updateTxs(root, side) {
     root.selectAll('.node .' + side + ' .id-nodelay')
         .text(d => isLeft
             ? d.left.sourceBalance - d.left.htlcAmount
-            : d.right.targetBalance - d.right.htlcAmount
+            : d.right.targetBalance
         );
 
     // revocation output value
