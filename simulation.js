@@ -94,14 +94,14 @@ class Simulation {
         const nodes = this.nodeContainer.selectAll('.node')
             .data(this._nodes);
 
-        /* remove deleted nodes */
+        // remove deleted nodes
         nodes.exit()
             .transition()
             .duration(1000)
             .style('opacity', 0)
             .remove();
 
-        /* create new nodes */
+        // create new nodes
         const enter = nodes.enter().append('g');
         createNodeElements(enter, opt);
         enter.call(this.behaviors.drag);
@@ -116,14 +116,14 @@ class Simulation {
         const channels = this.channelContainer.selectAll('.channel')
             .data(this._channels);
 
-        /* remove channels that no longer exist */
+        // remove channels that no longer exist
         channels.exit()
             .transition()
             .duration(500)
             .style('opacity', 0)
             .remove();
 
-        /* create new channels */
+        // create new channels
         let enter = channels.enter().append('g');
         createChannelElements(enter, opt);
 
